@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   class Sectors extends Model {
     static associate(models) {
       // has many companies, company has one sector
-      Sectors.hasMany(models.Company, {
+      Sectors.hasMany(models.Companies, {
         foreignKey: 'sectorId',
         as: 'companies',
       });

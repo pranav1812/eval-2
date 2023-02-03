@@ -1,24 +1,12 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Companies extends Model {
-    static associate(models) {
-      // belongs to one sector, sector has many companies
-      Companies.belongsTo(models.Sectors, {
-        foreignKey: 'sector',
-        onDelete: 'CASCADE',
-      });
-      // belongs to many tags (through CompanyTags)
-      Companies.belongsToMany(models.Tags, {
-        through: 'CompanyTags',
-        as: 'tags',
-        foreignKey: 'companyId',
-      });
-    }
+  class BadAll extends Model {
+    //
   }
-  Companies.init(
+  BadAll.init(
     {
-      id: {
+      compId: {
         allowNull: false,
         primaryKey: true,
         type: DataTypes.STRING,
@@ -42,15 +30,27 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: null,
       },
+      score: {
+        // float
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
       sector: {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      tags: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
+      },
     },
     {
+      freezeTableName: true,
       sequelize,
-      modelName: 'Companies',
+      modelName: 'BadAll',
+      timestamps: false,
     }
   );
-  return Companies;
+  return BadAll;
 };
