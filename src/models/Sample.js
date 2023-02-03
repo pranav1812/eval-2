@@ -4,6 +4,16 @@ module.exports = (sequelize, DataTypes) => {
   class Sample extends Model {
     static associate(models) {
       // define association here
+      // has many Users
+      Sample.hasMany(models.User, {
+        foreignKey: 'userId',
+        as: 'users',
+      });
+      // belongs to Organisation
+      Sample.belongsTo(models.Organisation, {
+        foreignKey: 'organisationId',
+        onDelete: 'CASCADE',
+      });
     }
   }
   Sample.init(
