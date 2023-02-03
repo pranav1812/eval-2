@@ -6,4 +6,18 @@ const saveToDatabase = async (data) => {
   console.log('saved to DB', dbRes);
 };
 
-module.exports = { saveToDatabase };
+const getSectorCompaniesOrderedByScore = async (sector) => {
+  const companies = await BadAll.findAll({
+    where: {
+      sector,
+    },
+    order: [['score', 'DESC']],
+  });
+  const toReturn = companies.map((company, ind) => ({
+    ...company.dataValues,
+    rank: ind + 1,
+  }));
+  return toReturn;
+};
+
+module.exports = { saveToDatabase, getSectorCompaniesOrderedByScore };

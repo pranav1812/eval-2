@@ -129,6 +129,14 @@ const extractCompanyData = async (urlLink) => {
 //   (res) => console.log(res)
 // );
 
+const getSectorCompaniesOrderedByScore = async (sector) => {
+  const orderedByScore = await DB_SERVICE.getSectorCompaniesOrderedByScore(
+    sector
+  );
+  return orderedByScore;
+};
+
 module.exports = {
   extractCompanyData,
+  getSectorCompaniesOrderedByScore,
 };
