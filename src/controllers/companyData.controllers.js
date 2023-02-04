@@ -1,5 +1,6 @@
 const cdServices = require('../services/companyData.services');
 const saveSchema = require('../schemas/save');
+const updateSchema = require('../schemas/update');
 
 const saveCompanyData = async (req, res) => {
   try {
@@ -34,7 +35,25 @@ const getSectorCompaniesOrderedByScore = async (req, res) => {
   }
 };
 
+const updateCompanyData = async (req, res) => {
+  try {
+    const { compId } = req.params;
+    const { error } = updateSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+    const { ...updateParams } = req.body;
+    const toReturn = await cdServices.updateCompanyData(compId, updateParams);
+    return res.status(201).json(toReturn);
+  } catch (error) {
+    //
+    console.log(`Error: ${error.message}`);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   saveCompanyData,
   getSectorCompaniesOrderedByScore,
+  updateCompanyData,
 };

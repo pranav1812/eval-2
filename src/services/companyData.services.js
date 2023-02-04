@@ -136,7 +136,13 @@ const getSectorCompaniesOrderedByScore = async (sector) => {
   return orderedByScore;
 };
 
+const updateCompanyData = async (compId, newParams) => {
+  const updatedCompany = await DB_SERVICE.updateCompany(compId, newParams);
+  return updatedCompany;
+};
+
 module.exports = {
   extractCompanyData,
   getSectorCompaniesOrderedByScore,
+  updateCompanyData,
 };

@@ -20,4 +20,17 @@ const getSectorCompaniesOrderedByScore = async (sector) => {
   return toReturn;
 };
 
-module.exports = { saveToDatabase, getSectorCompaniesOrderedByScore };
+const updateCompany = async (data, companyId) => {
+  const dbRes = await BadAll.update(data, {
+    where: {
+      compId: companyId,
+    },
+  });
+  return dbRes;
+};
+
+module.exports = {
+  saveToDatabase,
+  getSectorCompaniesOrderedByScore,
+  updateCompany,
+};
