@@ -12,7 +12,6 @@ const extractCompanyData = async (urlLink) => {
     const apiResponse = await axios.get(urlLink);
     const companySectorList =
       csvManipulation.extractCompanyListAsArrayOfObjects(apiResponse.data);
-    console.log(companySectorList);
 
     const perCompanyDataPromise = companySectorList.map((company) => {
       const { compId } = company;
@@ -20,12 +19,11 @@ const extractCompanyData = async (urlLink) => {
     });
     const perCompanyDataResolved = await Promise.all(perCompanyDataPromise);
     const perCompanyData = perCompanyDataResolved.map((data) => data.data);
-    console.log(perCompanyData);
 
     const compIdNameMap = {};
     const compCompleteMap = {};
     // ---------------------------------------------
-    perCompanyData.forEach((comp) => {
+    perCompanyData.forEach((comp, ind) => {
       const { id, name, tags, ceo, description } = comp;
       compIdNameMap[id] = name;
       compCompleteMap[id] = {
@@ -34,6 +32,7 @@ const extractCompanyData = async (urlLink) => {
         tags,
         ceo,
         description,
+        sector: companySectorList[ind].sector,
       };
     });
     // ---------------------------------------------
@@ -46,8 +45,6 @@ const extractCompanyData = async (urlLink) => {
       }
     });
 
-    console.log(sectorMetaMap);
-
     const sectorCompanyDataPromise = Object.keys(sectorMetaMap).map((sector) =>
       axios.get(`${sectorDataExtractionHost}=${sector}`)
     );
@@ -58,19 +55,12 @@ const extractCompanyData = async (urlLink) => {
 
     const sectorCompanyData = sectorCompanyDataResolved.map((res, ind) =>
       res.status === 200
-        ? { sector: companySectorList[ind].sector, resp: res.data }
+        ? { sector: Object.keys(sectorMetaMap)[ind], resp: res.data } // Object.keys(sectorMetaMap)[ind]
         : {}
-    );
-
-    console.log(
-      '\n\n\n',
-      JSON.stringify(sectorCompanyData[0], null, 2),
-      '\n\n\n'
     );
 
     const sectorCompanyDataWithScores = sectorCompanyData.map((sectorData) => {
       const { sector, resp } = sectorData;
-      const forDb = [];
       if (resp.length > 0) {
         resp.forEach((cd) => {
           const { score } = csvManipulation.calculateScore(cd);
@@ -95,7 +85,6 @@ const extractCompanyData = async (urlLink) => {
         csvManipulation.calculateScore(cd)
       );
 
-      // toBeStoredInDb.push(forDb);
       return {
         sector,
         companyWithScore,
@@ -103,10 +92,8 @@ const extractCompanyData = async (urlLink) => {
     });
     await DB_SERVICE.saveToDatabase(toBeStoredInDb);
 
-    console.log(JSON.stringify(sectorCompanyDataWithScores, null, 2));
-
-    // const toReturn = [{id: compId, name: compName, score}]
     const toReturn = [];
+
     sectorCompanyDataWithScores.forEach((sec) => {
       const { companyWithScore: cws } = sec;
       cws.forEach((comp) => {
@@ -117,17 +104,13 @@ const extractCompanyData = async (urlLink) => {
         });
       });
     });
-    console.log(toReturn.length);
+
     return toReturn.filter((cmp) => cmp.name !== undefined);
   } catch (error) {
-    console.log(`Error: ${error.message}`);
-    throw new Error(`Error: ${error.message}`);
+    console.error(error);
+    throw new Error(`Service Error: ${error.message}`);
   }
 };
-
-// extractCompanyData('https://store-0001.s3.amazonaws.com/input.csv').then(
-//   (res) => console.log(res)
-// );
 
 const getSectorCompaniesOrderedByScore = async (sector) => {
   const orderedByScore = await DB_SERVICE.getSectorCompaniesOrderedByScore(

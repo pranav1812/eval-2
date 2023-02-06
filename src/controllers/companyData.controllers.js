@@ -27,6 +27,11 @@ const getSectorCompaniesOrderedByScore = async (req, res) => {
     const orderedByScore = await cdServices.getSectorCompaniesOrderedByScore(
       sector
     );
+    if (!orderedByScore.length) {
+      return res
+        .status(404)
+        .json({ message: 'No companies found in this sector' });
+    }
     return res.status(200).json(orderedByScore);
   } catch (error) {
     return res.status(500).json({
@@ -44,6 +49,8 @@ const updateCompanyData = async (req, res) => {
     }
     const { ...updateParams } = req.body;
     const toReturn = await cdServices.updateCompanyData(compId, updateParams);
+    if (toReturn[0] === 0)
+      return res.status(404).json({ message: 'Company Not found' });
     return res.status(201).json(toReturn);
   } catch (error) {
     //

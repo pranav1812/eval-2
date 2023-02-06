@@ -1,5 +1,8 @@
 const Joi = require('joi');
 
 module.exports = Joi.object({
-  urlLink: Joi.string().required(),
+  // is url and ends with .csv
+  urlLink: Joi.string()
+    .uri()
+    .regex(/\.csv$/),
 });
