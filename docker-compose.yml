@@ -1,0 +1,50 @@
+# node App
+
+# postgres server with volume eval2Data
+
+services:
+  app:
+    image: node:18-alpine
+    command: sh -c "npm install && npm run migrate && node --watch src/index.js"
+    working_dir: /src
+    volumes:
+      - .:/src 
+    ports:
+      - 8000:8000
+    environment:
+      PORT: 8000
+      NODE_ENV: development
+      pg_username: "pranav_vohra"
+      pg_password: "ChangeItNow"
+      pg_database: "company_data"
+      pg_host: postgres # name of the postgres service
+      pg_port: 5432
+      externalAPI: http://external # name of the external service
+  
+  postgres:
+    image: postgres:13-alpine
+    volumes:
+      - postgresData:/var/lib/postgresql/data
+    ports:
+      - 5433:5432 # 5432 in the container, 5433 on the host
+    environment:
+      POSTGRES_PASSWORD: ChangeItNow
+      POSTGRES_USER: pranav_vohra
+      POSTGRES_DB: company_data
+  
+  external:
+    image: node:18-alpine
+    command: sh -c "cd /src && npm install && node --watch index.js"
+    working_dir: /src
+    volumes:
+      - ./BackendEvaluation:/src
+    # ports:
+    #   - 4000:4000
+    
+
+
+volumes:
+  postgresData:
+
+
+

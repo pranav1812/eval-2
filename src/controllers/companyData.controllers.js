@@ -8,7 +8,8 @@ const saveCompanyData = async (req, res) => {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
-    const { urlLink } = req.body;
+    // const { urlLink } = req.body;
+    const urlLink = `${process.env.externalAPI}:4000/${req.body.urlLink}`;
     const toReturn = await cdServices.extractCompanyData(urlLink);
     return res.status(201).json(toReturn);
   } catch (error) {

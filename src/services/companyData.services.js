@@ -3,8 +3,9 @@ const axios = require('axios');
 const csvManipulation = require('../utils/csvManipulation');
 const DB_SERVICE = require('./saveToDatabase.service');
 
-const perCompanyHost = 'http://54.167.46.10/company';
-const sectorDataExtractionHost = 'http://54.167.46.10/sector?name';
+const externalHost = `${process.env.externalAPI}:4000`;
+const perCompanyHost = `${externalHost}/company`;
+const sectorDataExtractionHost = `${externalHost}/sector?name`;
 
 const extractCompanyData = async (urlLink) => {
   try {
@@ -37,7 +38,7 @@ const extractCompanyData = async (urlLink) => {
     });
     // ---------------------------------------------
 
-    const sectorMetaMap = {};
+    const sectorMetaMap = {}; // using hashmap as there is no hashmap implementation in Javascript
     companySectorList.forEach((cs) => {
       const { compId, sector } = cs;
       if (!sectorMetaMap[sector]) {
